@@ -11,7 +11,6 @@ import time
 import argparse
 import numpy as np
 
-from torch.autograd import Variable
 
 import imdbfolder_coco as imdbfolder
 import config_task
@@ -33,7 +32,8 @@ parser.add_argument('--dropout', default='00', type=str, help='Position of dropo
 parser.add_argument('--expdir', default='/net/blackorpheus/veniat/temp/exp/', help='Save folder')
 parser.add_argument('--datadir', default='/net/blackorpheus/veniat/data/vision/VDD/decathlon-1.0/', help='folder containing data folder')
 parser.add_argument('--imdbdir', default='/net/blackorpheus/veniat/data/vision/VDD/decathlon-1.0/annotations/', help='annotation folder')
-parser.add_argument('--source', default='/scratch/shared/nfs1/srebuffi/exp/dem_learning/C100_alone/checkpoint/ckptpost11bnresidual11cifar1000.000180607060.t7', type=str, help='Network source')
+parser.add_argument('--load_path', default='/net/blackorpheus/veniat/data/vision/VDD/decathlon-1.0/pretrained/', type=str, help='Network source')
+parser.add_argument('--source', default='resnet26_pretrained.t7', type=str, help='Network source')
 parser.add_argument('--seed', default=0, type=int, help='seed')
 parser.add_argument('--factor', default='1.', type=float, help='Width factor of the network')
 args = parser.parse_args()
