@@ -66,15 +66,17 @@ def train(epoch, tloaders, tasks, net, args, optimizer,list_criterion=None):
         # measure data loading time
         data_time.update(time.time() - end)
         if args.use_cuda:
-            inputs, targets = inputs.cuda(async=True), targets.cuda(async=True)
+#            inputs, targets = inputs.cuda(async=True), targets.cuda(async=True)
+            targets = targets.cuda()
+            inputs = inputs.cuda()
         optimizer.zero_grad()
         inputs, targets = Variable(inputs), Variable(targets)
         outputs = net(inputs)
         loss = args.criterion(outputs, targets)
         # measure accuracy and record loss
-        (losses[current_task_index]).update(loss.data[0], targets.size(0))
-        _, predicted = torch.max(outputs.data, 1)
-        correct = predicted.eq(targets.data).cpu().sum()
+        (losses[current_task_index]).update(loss.item(), targets.size(0))
+        _, predicted = torch.max(outputs, 1)
+        correct = predicted.eq(targets).cpu().sum()
         (top1[current_task_index]).update(correct*100./targets.size(0), targets.size(0))     
         # apply gradients   
         loss.backward()
@@ -109,15 +111,15 @@ def test(epoch, loaders, all_tasks, net, best_acc, args, optimizer):
         for batch_idx, (inputs, targets) in enumerate(loaders[i]):
             if args.use_cuda:
                 inputs, targets = inputs.cuda(), targets.cuda()
-            inputs, targets = Variable(inputs, volatile=True), Variable(targets)
-            outputs = net(inputs)
+            with torch.no_grad():
+                outputs = net(inputs)
             if isinstance(outputs, tuple):
                 outputs = outputs[0]
             loss = args.criterion(outputs, targets)
             
-            losses[itera].update(loss.data[0], targets.size(0))
-            _, predicted = torch.max(outputs.data, 1)
-            correct = predicted.eq(targets.data).cpu().sum()
+            losses[itera].update(loss.item(), targets.size(0))
+            _, predicted = torch.max(outputs, 1)
+            correct = predicted.eq(targets).cpu().sum()
             top1[itera].update(correct*100./targets.size(0), targets.size(0))
         
         print('Task {0} : Test Loss {loss.val:.4f} ({loss.avg:.4f})\t'
